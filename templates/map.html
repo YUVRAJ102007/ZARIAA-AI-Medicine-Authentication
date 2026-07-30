@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-panel">
+    <div class="page-shell">
+
+        <h1>Nearby Pharmacies</h1>
+
+        <!-- 🔍 SEARCH BAR -->
+        <div style="margin-bottom:20px;">
+            <input id="searchBox" placeholder="Search medicine..." style="padding:10px;width:70%;">
+            <button onclick="searchMedicine()" class="btn btn-gradient">Search</button>
+        </div>
+
+        <!-- MAP -->
+        <div id="map" style="height:400px;border-radius:12px;"></div>
+
+        <!-- RESULTS -->
+        <div id="results"></div>
+
+    </div>
+</section>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+let map = L.map('map').setView([28.61, 77.20], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+// LOAD ALL PHARMACIES
+fetch("/pharmacies")
+.then(res => res.json())
+.then(data => {
+    data.forEach(p => {
+        L.marker([p.lat, p.lng])
+        .addTo(map)
+        .bindPopup(`<b>${p.name}</b><br>Rating: ${p.rating}`);
+    });
+});
+
+// 🔍 SEARCH FUNCTION
+function searchMedicine(){
+    let name = document.getElementById("searchBox").value;
+
+    fetch(`/search_medicine?name=${name}`)
+    .then(res => res.json())
+    .then(data => {
+        let html = "";
+
+        data.forEach(p => {
+            html += `
+                <div class="result-card">
+                    <h3>${p.name}</h3>
+                    <p>Rating: ${p.rating}</p>
+                    <button onclick="rate('${p.name}')">Rate</button>
+                </div>
+            `;
+        });
+
+        document.getElementById("results").innerHTML = html;
+    });
+}
+
+// ⭐ RATE
+function rate(name){
+    let r = prompt("Rate 1-5");
+
+    fetch("/rate", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({name, rating:Number(r)})
+    });
+}
+</script>
+
+{% endblock %}

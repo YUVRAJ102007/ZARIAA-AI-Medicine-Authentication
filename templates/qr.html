@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-panel">
+    <div class="page-shell qr-shell">
+        <div class="qr-result-card tilt-card" data-tilt>
+            <p class="page-eyebrow">QR Generated</p>
+            <h1>Your secure medicine code is ready.</h1>
+            <p>
+                Attach this QR to the package and use the scan screen whenever you need to verify it.
+            </p>
+
+            <div class="qr-frame">
+                <img src="{{ qr }}" alt="QR Code" style="max-width:210px;">
+            </div>
+
+            <div class="qr-summary">
+                <div>
+                    <span>Name</span>
+                    <strong>{{ name }}</strong>
+                </div>
+                <div>
+                    <span>Batch</span>
+                    <strong>{{ batch }}</strong>
+                </div>
+                <div>
+                    <span>Expiry</span>
+                    <strong>{{ expiry }}</strong>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <a href="/scan" class="btn btn-gradient">Verify This QR</a>
+                <a href="/register" class="btn btn-outline-dark">Register Another</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

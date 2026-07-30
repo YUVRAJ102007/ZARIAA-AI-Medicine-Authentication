@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="figma-section hero-figma">
+    <div class="figma-shell hero-grid">
+        <div class="hero-copy">
+            <p class="page-eyebrow">AI-assisted pharma trust layer</p>
+            <h1 class="hero-brand">ZARIAA</h1>
+            <p class="hero-summary">
+                Secure medicine verification with encrypted QR identity, duplicate scan detection, and
+                instant risk verdicts for pharmacy and supply-chain teams.
+            </p>
+            <div class="hero-actions">
+                {% if is_authenticated %}
+                <a href="/register" class="btn btn-soft">Register Medicine</a>
+                <a href="/scan" class="btn btn-gradient">Scan Package</a>
+                {% else %}
+                <a href="/login" class="btn btn-gradient">Login to Continue</a>
+                <a href="/login" class="btn btn-outline-dark">Open Workspace</a>
+                {% endif %}
+            </div>
+
+            <div class="trust-row">
+                <div class="trust-card">
+                    <strong>Encrypted IDs</strong>
+                    <span>Protected payloads before distribution.</span>
+                </div>
+                <div class="trust-card">
+                    <strong>Instant verdicts</strong>
+                    <span>Genuine, expired, duplicate, or counterfeit.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="scene-glow scene-glow-a"></div>
+            <div class="scene-glow scene-glow-b"></div>
+
+            <div class="hero-scene tilt-card" data-tilt>
+                <div class="orb orb-large"></div>
+                <img
+                    src="/static/assets/capsules-hero.png"
+                    alt="Floating medicine capsules"
+                    class="hero-asset hero-asset-main"
+                >
+
+                <div class="floating-panel panel-top">
+                    <span class="panel-label">Registry Sync</span>
+                    <strong>97.9%</strong>
+                </div>
+
+                <div class="floating-panel panel-bottom">
+                    <span class="status-dot"></span>
+                    <div>
+                        <strong>Live Verification</strong>
+                        <small>Ready for scan workflow</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="figma-section overview-figma">
+    <div class="figma-shell overview-grid">
+        <div class="overview-copy">
+            <h2>Designing confidence into every medicine verification touchpoint</h2>
+            <p class="overview-text">
+                VORTEX creates a calmer workflow for high-stakes verification. Operators can register
+                packages, scan codes in the field, and understand the result at a glance.
+            </p>
+
+            <div class="feature-stack">
+                <article class="feature-strip">
+                    <strong>Encrypted IDs</strong>
+                    <span>QR payloads are protected before distribution.</span>
+                </article>
+                <article class="feature-strip">
+                    <strong>Duplicate alerts</strong>
+                    <span>Repeat scans are surfaced instantly for investigation.</span>
+                </article>
+                <article class="feature-strip">
+                    <strong>Expiry awareness</strong>
+                    <span>Operators can identify invalid packages in seconds.</span>
+                </article>
+            </div>
+        </div>
+
+        <div class="overview-visual">
+            <div class="verification-stage tilt-card" data-tilt>
+                <div class="stage-disc"></div>
+                <img
+                    src="/static/assets/medicines-cluster.png"
+                    alt="Medicine pack visual"
+                    class="overview-asset"
+                >
+                <div class="stage-note">
+                    <strong>Verification Summary</strong>
+                    <span>Scan once and decide faster.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="figma-section scanner-showcase">
+    <div class="figma-shell scan-center">
+        <div class="scan-card motion-panel tilt-card" data-tilt>
+            <p class="scan-title">Scan QR Code</p>
+            <div class="scan-window showcase-window">
+                <img src="/static/assets/qr-showcase.png" alt="QR scanner preview" class="showcase-image">
+            </div>
+            <div class="scan-actions">
+                <span class="scan-pill scan-pill-muted">ENCRYPTED</span>
+                <span class="scan-pill scan-pill-accent">VERIFY</span>
+            </div>
+        </div>
+
+        <p class="scan-caption">Generate and verify secure medicine QR codes with one workflow.</p>
+        <a href="/scan" class="btn btn-linkish">Open Live Scanner</a>
+    </div>
+</section>
+
+<section class="figma-section register-showcase">
+    <div class="figma-shell register-showcase-shell">
+        <div class="register-blob tilt-card" data-tilt>
+            <img src="/static/assets/pill-bottle.png" alt="Pill bottle illustration" class="register-art">
+            <h2>Registered Here</h2>
+            <p class="register-copy">
+                Create a trusted medicine identity and push it into the verification loop.
+            </p>
+            {% if is_authenticated %}
+            <form method="POST" action="/register" class="home-register-form">
+                <input name="name" placeholder="Medicine details" required>
+                <input name="expiry" placeholder="Expiry year" required>
+                <input name="batch" placeholder="Batch NO." required>
+                <input name="salt" placeholder="Salt composition" required>
+                <button type="submit" class="btn btn-gradient">Register</button>
+            </form>
+            {% else %}
+            <div class="login-prompt-card">
+                <strong>Login required for secure registration</strong>
+                <span>Open the protected workspace to register medicines and create QR records.</span>
+                <a href="/login" class="btn btn-gradient">Login to Register</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

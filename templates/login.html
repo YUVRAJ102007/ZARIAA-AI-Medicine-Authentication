@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-panel login-panel">
+    <div class="page-shell login-shell">
+        <div class="login-visual tilt-card" data-tilt>
+            <div class="login-visual-copy">
+                <p class="page-eyebrow">Secure Access</p>
+                <h1>Enter the VORTEX verification workspace.</h1>
+                <p>
+                    Login to register medicines, scan encrypted packages, and review verification
+                    results in the protected operator dashboard.
+                </p>
+            </div>
+
+            <div class="login-visual-stage">
+                <div class="login-orb"></div>
+                <img src="/static/assets/vortex-logo.png" alt="VORTEX logo" class="login-logo">
+                <img src="/static/assets/pill-bottle.png" alt="Medicine bottle" class="login-bottle">
+                <div class="login-chip chip-a">Registry</div>
+                <div class="login-chip chip-b">Verified Access</div>
+            </div>
+        </div>
+
+        <div class="login-card tilt-card" data-tilt>
+            <p class="page-eyebrow">Login</p>
+            <h2>Access your account</h2>
+
+            {% if error %}
+            <div class="notice notice-error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="stack-form">
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email address"
+                    value="{{ values.get('email', '') }}"
+                    required
+                >
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                >
+                <button type="submit" class="btn btn-gradient">Login to VORTEX</button>
+            </form>
+
+            <div class="demo-accounts">
+                <strong>Demo accounts</strong>
+                <div class="demo-account">
+                    <span>admin@vortex.local</span>
+                    <small>admin123</small>
+                </div>
+                <div class="demo-account">
+                    <span>inspector@vortex.local</span>
+                    <small>inspect2026</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<script src="https://unpkg.com/html5-qrcode"></script>
+{% endblock %}
+
+{% block content %}
+<section class="page-panel">
+    <div class="page-shell split-shell scan-shell">
+
+        <!-- LEFT SIDE -->
+        <div class="page-copy">
+            <p class="page-eyebrow">Verification</p>
+            <h1>Scan and verify medicine instantly</h1>
+            <p>
+                Detect counterfeit, expired, or duplicate medicines using encrypted QR verification.
+            </p>
+
+            <div class="legend-list">
+                <span class="legend-item legend-green">Genuine</span>
+                <span class="legend-item legend-yellow">Expired</span>
+                <span class="legend-item legend-orange">Duplicate</span>
+                <span class="legend-item legend-red">Counterfeit</span>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="scan-page-card tilt-card">
+
+            <!-- SCANNER -->
+            <div class="scan-card">
+                <p class="scan-title">Scan QR Code</p>
+                <div id="reader" class="scan-window"></div>
+            </div>
+
+            <!-- RESULT -->
+            <div id="result" class="result-area">
+                <div class="result-placeholder">
+                    <strong>Ready to scan</strong>
+                    <p>Your result will appear here</p>
+                </div>
+            </div>
+
+            <!-- REPORT SECTION -->
+            <div id="report-section" style="display:none; margin-top:15px;">
+                <h3>Report Issue</h3>
+
+                <select id="issue">
+                    <option value="Fake">Fake</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Damaged">Damaged</option>
+                </select>
+
+                <input id="note" placeholder="Optional note">
+
+                <button onclick="submitReport()" class="btn btn-gradient">
+                    Submit Report
+                </button>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="button-row">
+                <button onclick="restartScan()" class="btn btn-soft">Scan Again</button>
+                <a href="/register" class="btn btn-outline-dark">Register</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+let scanner;
+let hasScanned = false;
+let lastScannedData = null;
+
+// START SCANNER
+async function startScanner() {
+    scanner = new Html5Qrcode("reader");
+
+    await scanner.start(
+        { facingMode: "environment" },
+        {
+            fps: 10,
+            qrbox: { width: 220, height: 220 },
+            aspectRatio: 1.0
+        },
+        onScanSuccess
+    );
+}
+
+// SCAN SUCCESS
+async function onScanSuccess(decodedText) {
+
+    if (hasScanned) return;
+    hasScanned = true;
+
+    lastScannedData = decodedText.trim();
+
+    // 🔥 STOP SCANNER IMMEDIATELY
+    try {
+        await scanner.stop();
+    } catch {}
+
+    // OFFLINE MODE
+    if (!navigator.onLine) {
+        let scans = JSON.parse(localStorage.getItem("offline_scans") || "[]");
+
+        scans.push({
+            data: lastScannedData,
+            time: new Date()
+        });
+
+        localStorage.setItem("offline_scans", JSON.stringify(scans));
+
+        document.getElementById("result").innerHTML = `
+            <h3 style="color:orange;">Offline Mode</h3>
+            <p>Scan saved locally</p>
+        `;
+        return;
+    }
+
+    // VERIFY
+    fetch("/verify", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ data: lastScannedData })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        let color = "white";
+
+        if (data.status === "GENUINE") color = "green";
+        else if (data.status === "EXPIRED") color = "orange";
+        else if (data.status === "DUPLICATE") color = "yellow";
+        else color = "red";
+
+        document.getElementById("result").innerHTML = `
+            <h2 style="color:${color}">${data.status}</h2>
+            <p><strong>${data.name || "Unknown"}</strong></p>
+            <p>Expiry: ${data.expiry || "-"}</p>
+        `;
+
+        // 🚨 REPORT ONLY IF COUNTERFEIT
+        if (data.status === "COUNTERFEIT") {
+            document.getElementById("report-section").style.display = "block";
+        }
+    });
+}
+
+// RESTART
+async function restartScan() {
+    hasScanned = false;
+
+    document.getElementById("result").innerHTML = `
+        <div class="result-placeholder">
+            <strong>Ready to scan</strong>
+            <p>Your result will appear here</p>
+        </div>
+    `;
+
+    document.getElementById("report-section").style.display = "none";
+
+    try {
+        await scanner.stop();
+    } catch {}
+
+    startScanner();
+}
+
+// REPORT
+function submitReport() {
+    const issue = document.getElementById("issue").value;
+    const note = document.getElementById("note").value;
+
+    fetch("/report", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            data: lastScannedData,
+            issue,
+            note
+        })
+    })
+    .then(() => alert("Report submitted"));
+}
+
+// OFFLINE SYNC
+window.addEventListener("online", async () => {
+    let scans = JSON.parse(localStorage.getItem("offline_scans") || "[]");
+
+    for (let scan of scans) {
+        await fetch("/verify", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ data: scan.data })
+        });
+    }
+
+    localStorage.removeItem("offline_scans");
+});
+
+// INIT
+window.onload = startScanner;
+</script>
+{% endblock %}

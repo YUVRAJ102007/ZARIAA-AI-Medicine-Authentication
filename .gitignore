@@ -1,0 +1,7 @@
+key.key
+database.json
+pharmacies.json
+__pycache__/
+*.pyc
+venv/
+.venv/

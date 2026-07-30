@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-panel">
+    <div class="page-shell split-shell">
+        <div class="page-copy">
+            <p class="page-eyebrow">Registration</p>
+            <h1>Register a medicine package with the VORTEX identity layer.</h1>
+            <p>
+                Add the package details carefully to generate a QR code that can be verified later by
+                pharmacists, supply-chain teams, and inspectors.
+            </p>
+            <div class="side-visual-card tilt-card" data-tilt>
+                <img src="/static/assets/medicines-cluster.png" alt="Medicine assortment" class="side-visual-image">
+                <div class="side-visual-note">
+                    <strong>Registry-ready package record</strong>
+                    <span>Capture the details once and generate a secure QR identity.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="register-card tilt-card" data-tilt>
+            <h2>Registered Here</h2>
+
+            {% if error %}
+            <div class="notice notice-error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="stack-form">
+                <input
+                    name="name"
+                    placeholder="Medicine details"
+                    value="{{ values.get('name', '') }}"
+                    required
+                >
+                <input
+                    name="expiry"
+                    placeholder="Expiry year"
+                    value="{{ values.get('expiry', '') }}"
+                    required
+                >
+                <input
+                    name="batch"
+                    placeholder="Batch NO."
+                    value="{{ values.get('batch', '') }}"
+                    required
+                >
+                <input
+                    name="salt"
+                    placeholder="Salt composition"
+                    value="{{ values.get('salt', '') }}"
+                    required
+                >
+
+                <div class="button-row">
+                    <button type="submit" class="btn btn-gradient">Register</button>
+                    <a href="/scan" class="btn btn-outline-dark">Scan Instead</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
