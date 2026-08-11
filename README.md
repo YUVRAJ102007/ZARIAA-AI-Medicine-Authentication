@@ -63,7 +63,6 @@ Sensitive data such as encryption keys are **not stored in the public repository
 * Yuvraj
 * Smayra
 * Kulwinder Singh
-* Diya Goel
 
 ---
 
