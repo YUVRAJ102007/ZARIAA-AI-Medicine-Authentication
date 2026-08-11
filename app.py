@@ -253,12 +253,13 @@ def rate():
 
 # ===================== RUN =====================
 
-if __name__ == "__main__":
-    app.run(debug=True)
-
 @app.context_processor
 def inject_user():
     return {
         "is_authenticated": "user_email" in session,
         "current_user": session.get("user_email")
     }
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
